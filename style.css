@@ -87,7 +87,7 @@ code {
 }
 
 /* -------------------------------
-   Link Styling (Improved Aesthetic)
+   Link Styling
 --------------------------------- */
 a {
   color: #0070f3;
@@ -102,6 +102,18 @@ a:hover {
 
 a:visited {
   color: #5a4fcf;
+}
+
+/* Author link styling (subtle but noticeable) */
+.author-link {
+  color: #555; /* slightly darker than surrounding #777 */
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.author-link:hover {
+  color: #222; /* darker on hover, matches h1 for subtle emphasis */
+  text-decoration: none;
 }
 
 /* -------------------------------
