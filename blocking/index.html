@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Blocking</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Blocking</h1>
+    <p class="post-meta">By Laurence Wong · September 12, 2016</p>
+
+    <p>With the sample divided into strata of units that have similar propensity scores, we should be able to get clean estimates of treatment effects within each block. Aggregating these estimates appropriately gives the blocking estimator, which we illustrate in this post.</p>
+
+    <p>To begin, let's continue with the <a href="/software-blog/example">example data set</a>, and use everything we have discussed previously on it:</p>
+
+    <pre><code>>>> Y, D, X = vignette_data()
+>>> causal = CausalModel(Y, D, X)
+>>> causal.est_propensity_s()
+>>> causal.trim_s()
+>>> causal.stratify_s()
+>>> print(causal.strata)
+
+Stratification Summary
+
+              Propensity Score         Sample Size     Ave. Propensity   Outcome
+   Stratum      Min.      Max.  Controls   Treated  Controls   Treated  Raw-diff
+--------------------------------------------------------------------------------
+         1     0.095     0.265       157        28     0.188     0.187    11.885
+         2     0.266     0.474       111        72     0.360     0.367    12.025
+         3     0.477     0.728        70       113     0.598     0.601    11.696
+         4     0.728     0.836        23        69     0.781     0.787    10.510
+         5     0.838     0.904        10        81     0.865     0.873     3.405</code></pre>
+
+    <p>Now because each stratum contains only units that have similar propensity scores, the raw difference in average outcomes should be a decent estimate of the within-bin average treatment effect. There is no reason why we can't further control for covariates within each block, however.</p>
+
+    <p>One way we can do this — because each stratum in <code>strata</code> is a <code>CausalModel</code> instance in its own right — is simply to manually loop through <code>strata</code> and estimate the within-block average treatment effect via, say, least squares:</p>
+
+    <pre><code>>>> for stratum in causal.strata:
+...     stratum.est_via_ols(adj=1)</code></pre>
+
+    <p>We can collect these results together in a list:</p>
+
+    <pre><code>>>> [stratum.estimates['ols']['ate'] for stratum in causal.strata]
+[10.379170390195274, 9.2918973715823867, 9.6787670925744589, 9.6722830043583361, 9.2239596078237778]</code></pre>
+
+    <p>Note that these estimates are much more stable and closer to the true treatment effect of 10 than the within-bin raw differences in average outcomes that were reported in the stratification summary table, highlighting the virtue of further controlling for covariates even within blocks. Also note that, even though we are using least squares here, we are only doing so <i>locally</i> within each stratum, and therefore are not plagued by some of the issues we raised earlier when we discussed the <a href="/software-blog/least-squares">standard least squares approach</a>.</p>
+
+    <p>Taking the sample-weighted average of the above within-bin least squares estimates results in a propensity score matching estimator that is commonly known as the blocking estimator. However, instead of looping through the <code>strata</code> attribute and doing everything manually, we can also simply call <code>est_via_blocking</code> and have all of these operations performed automatically, with the results collected into the attribute <code>estimates</code> as usual:</p>
+
+    <pre><code>>>> causal.est_via_blocking()
+>>> print(causal.estimates)
+
+Treatment Effect Estimates: Blocking
+
+                     Est.       S.e.          z      P>|z|      [95% Conf. int.]
+--------------------------------------------------------------------------------
+           ATE      9.702      0.381     25.444      0.000      8.954     10.449
+           ATC      9.847      0.527     18.701      0.000      8.815     10.879
+           ATT      9.553      0.332     28.771      0.000      8.903     10.204</code></pre>
+
+    <p>As we can see in the results table, the estimated average treatment effect is now very close to the true value of 10.</p>
+  </div>
+</body>
+</html>
