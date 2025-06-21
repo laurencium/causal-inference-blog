@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Propensity Score</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Propensity Score</h1>
+    <p class="post-meta">By Laurence Wong · August 15, 2016</p>
+
+    <p>The probability of receiving treatment, also known as the propensity score, plays a very special role in the estimation of treatment effects. In this post we will consider how to estimate the propensity score. In subsequent posts we will look at how it can be used to enrich our causal analysis.</p>
+
+    <p>Recall unconfoundedness assumes that conditional on the covariates, potential outcomes are independent of treatment assignment:</p>
+
+    <p>\[ (Y(0), Y(1)) \perp D \; | \; X \]</p>
+
+    <p>Previously we saw how we could derive an excellent treatment effect estimator using this assumption by matching individuals based on their covariate values. It turns out that, as proven in Rosenbaum and Rubin's seminal paper in 1983, the above condition implies that the following is also true:</p>
+
+    <p>\[ (Y(0), Y(1)) \perp D \; | \; p(X) \]</p>
+
+    <p>In other words, conditional on the propensity score \(p(X) = \mathrm{P}(D = 1 | X)\), treatment assignment is essentially as good as random. This means that for subjects that share the same propensity score (even if their covariate vectors are different), the difference between the treated and the control units actually identifies a conditional average treatment effect, namely \(\mathrm{E}[Y(1) - Y(0) | p(X)]\). Thus instead of matching on the covariate vectors \(X\) themselves, we can match on the single-dimensional propensity score \(p(X)\), aggregate across subjects, and still arrive at a valid estimate of the overall average treatment effect.</p>
+
+    <p>Indeed, as we shall see, the propensity score is useful in other ways beyond providing yet another estimator. It can also be used for assessing and improving covariate balance, for example, among other things.</p>
+
+    <p>To estimate the propensity score, note that since it represents nothing other than the probability of receiving treatment conditional on the covariates, it can be estimated based on data on the observable variables \(D\) and \(X\). As the functional form of \(\mathrm{P}(D = 1 | X)\) is usually unknown, Hirano, Imbens, and Ridder (2003) suggest estimating it using a flexibly-specified logistic regression.</p>
+
+    <p>In <i>Causalinference</i>, this can be done by using either one of the methods <code>est_propensity</code> or <code>est_propensity_s</code>. The former allows the user to specify which covariates to include linearly and/or quadratically, while the latter will make this choice automatically based on a sequence of likelihood ratio (LR) tests.</p>
+
+    <p>More specifically, Imbens and Rubin (2015) recommend the following algorithm for variable selection in the estimation of the propensity score. At a high level, the steps are:</p>
+
+    <ol>
+      <li>Decide on a basic set of covariates to always include in every specification; call them \(X_B\), and run a logistic regression of \(D\) on \(X_B\).</li>
+      <li>Include an additional variable in \(X\) that is not in \(X_B\) and rerun the logistic regression. Calculate the likelihood ratio test statistic for the null hypothesis that the coefficient on this additional variable is equal to zero.</li>
+      <li>Repeat Step 2 for every remaining covariate. If the largest LR statistic is larger than some threshold \(C_{lin}\), include the corresponding variable into the basic set of covariates, and repeat Step 2 with this new basic set. Otherwise, none of the non-basic covariates resulted in a significant LR statistic, so don't include any of them.</li>
+      <li>Repeat Steps 2 and 3 for second-order terms for covariates that have been selected for inclusion in the linear part of the specification. Call the threshold used for the inclusion decision \(C_{qua}\).</li>
+    </ol>
+
+    <p>This procedure is not guaranteed to select the best functional form for \(\mathrm{P}(D = 1 | X)\), but it should nonetheless result in a sensible specification that groups subjects with similar covariate values together through a single-dimensional score.</p>
+
+    <p>To perform the above propensity score estimation procedure in <i>Causalinference</i> and display the logistic regression results, simply go</p>
+
+    <pre><code>>>> causal.est_propensity_s()
+>>> print(causal.propensity)
+
+Estimated Parameters of Propensity Score
+
+                    Coef.       S.e.          z      P>|z|      [95% Conf. int.]
+--------------------------------------------------------------------------------
+     Intercept     -2.839      0.526     -5.401      0.000     -3.870     -1.809
+            X1      0.486      0.153      3.178      0.001      0.186      0.786
+            X0      0.466      0.155      3.011      0.003      0.163      0.770
+         X1*X0      0.080      0.015      5.391      0.000      0.051      0.109
+         X0*X0     -0.045      0.012     -3.579      0.000     -0.069     -0.020
+         X1*X1     -0.045      0.013     -3.542      0.000     -0.070     -0.020</code></pre>
+
+    <p>The table above shows the standard results that would usually be reported when a logistic regression is run. To access directly these outputs, as well as other computed values like the estimated propensity scores, we can inspect the dictionary-like attribute <code>propensity</code>:</p>
+
+    <pre><code>>>> causal.propensity.keys()
+['coef', 'lin', 'qua', 'loglike', 'fitted', 'se']</code></pre>
+
+    <p>Of note are <code>propensity['lin']</code> and <code>propensity['qua']</code>, which contain, respectively, the linear and quadratic terms selected by the algorithm, and <code>propensity['fitted']</code>, which contains the estimated propensity score of each subject.</p>
+
+    <p>It is also possible to customize <code>est_propensity_s</code> by deliberately specifying the basic covariates \(X_B\) and the variable inclusion decision thresholds \(C_{lin}\) and \(C_{qua}\). Details on how this can be done can be found in the <a target="_blank" href="http://causalinferenceinpython.org/causalinference.html#causalinference.causal.CausalModel.est_propensity_s">documentation for the method</a>.</p>
+
+    <h3>References</h3>
+
+    <p>Hirano, K., Imbens, G., & Ridder, G. (2003). Efficient estimation of average treatment effects using the estimated propensity score. <i>Econometrica, 71</i>, 1161–1189.</p>
+
+    <p>Imbens, G. & Rubin, D. (2015). <i>Causal Inference in Statistics, Social, and Biomedical Sciences: An Introduction</i>. Cambridge University Press.</p>
+
+    <p>Rosenbaum, P. & Rubin, D. (1983). The central role of the propensity score in observational studies for causal effects. <i>Biometrika, 70</i>, 41–55.</p>
+  </div>
+</body>
+</html>
