@@ -1,4 +1,6 @@
-/* Typography */
+/* -------------------------------
+   Typography
+--------------------------------- */
 body {
   font-family: "Georgia", serif;
   color: #444;
@@ -26,26 +28,18 @@ p {
   margin-bottom: 1.2em;
 }
 
-code {
-  background-color: #f0f0f0;
-  padding: 0.2em 0.4em;
-  border-radius: 3px;
-}
-
-/* Layout */
+/* -------------------------------
+   Layout and Structure
+--------------------------------- */
 .container {
   max-width: 660px;
   margin: 3rem auto;
   padding: 0 1rem;
 }
 
-.post-meta {
-  font-size: 0.9rem;
-  color: #777;
-  margin-top: -1em;
-  margin-bottom: 2em;
-}
-
+/* -------------------------------
+   Code Blocks and Inline Code
+--------------------------------- */
 pre {
   background: #f8f8f8;
   padding: 1rem;
@@ -56,4 +50,45 @@ pre {
 
 code {
   font-family: Menlo, Monaco, Consolas, monospace;
+  background-color: #f0f0f0;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
+/* -------------------------------
+   Meta Information
+--------------------------------- */
+.post-meta,
+.byline {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: -1em;
+  margin-bottom: 2em;
+}
+
+/* -------------------------------
+   Index Page: Table of Contents
+--------------------------------- */
+.post-index {
+  padding-left: 1.5em;
+  font-size: 1.1em;
+  line-height: 1.8;
+}
+
+.post-index li {
+  margin: 0.3em 0;
+}
+
+/* -------------------------------
+   Link Styling (Improved Aesthetic)
+--------------------------------- */
+a {
+  color: #3366cc;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(51, 102, 204, 0.3);
+}
+
+a:hover {
+  color: #1a4fb2;
+  border-bottom: 1px solid rgba(26, 79, 178, 0.5);
 }
