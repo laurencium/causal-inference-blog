@@ -97,3 +97,34 @@ a:hover {
 a:visited {
   color: #5a4fcf; /* soft indigo for visited links */
 }
+
+/* -------------------------------
+   Post Navigation
+--------------------------------- */
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.post-nav a {
+  color: #3366cc;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.post-nav a:hover {
+  color: #003399;
+}
+
+.post-nav .prev {
+  text-align: left;
+}
+
+.post-nav .next {
+  text-align: right;
+  margin-left: auto;
+}
