@@ -1,1 +1,1 @@
-# software-blog
+# causal-inference-blog
