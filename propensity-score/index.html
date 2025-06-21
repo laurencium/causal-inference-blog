@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Propensity Score</title>
-  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <link rel="stylesheet" href="/causal-inference-blog/style.css?v=2">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script type="text/javascript" id="MathJax-script" async
@@ -13,7 +13,12 @@
 <body>
   <div class="container">
     <h1>Propensity Score</h1>
-    <p class="post-meta">By Laurence Wong · August 15, 2016</p>
+    <div class="post-meta-bar">
+      <p class="post-meta">
+        By <a href="https://laurencewong.com/" class="author-link" target="_blank" rel="noopener">Laurence Wong</a> · August 15, 2016
+      </p>
+      <p class="index-link"><a href="/causal-inference-blog/">← Back to Index</a></p>
+    </div>
 
     <p>The probability of receiving treatment, also known as the propensity score, plays a very special role in the estimation of treatment effects. In this post we will consider how to estimate the propensity score. In subsequent posts we will look at how it can be used to enrich our causal analysis.</p>
 
@@ -67,7 +72,7 @@ Estimated Parameters of Propensity Score
 
     <p>Of note are <code>propensity['lin']</code> and <code>propensity['qua']</code>, which contain, respectively, the linear and quadratic terms selected by the algorithm, and <code>propensity['fitted']</code>, which contains the estimated propensity score of each subject.</p>
 
-    <p>It is also possible to customize <code>est_propensity_s</code> by deliberately specifying the basic covariates \(X_B\) and the variable inclusion decision thresholds \(C_{lin}\) and \(C_{qua}\). Details on how this can be done can be found in the <a target="_blank" href="http://causalinferenceinpython.org/causalinference.html#causalinference.causal.CausalModel.est_propensity_s">documentation for the method</a>.</p>
+    <p>It is also possible to customize <code>est_propensity_s</code> by deliberately specifying the basic covariates \(X_B\) and the variable inclusion decision thresholds \(C_{lin}\) and \(C_{qua}\). Details on how this can be done can be found in the <a target="_blank" href="http://causalinferenceinpython.org/causalinference.html#causalinference.causal.CausalModel.est_propensity_s" rel="noopener">documentation for the method</a>.</p>
 
     <h3>References</h3>
 
@@ -77,8 +82,8 @@ Estimated Parameters of Propensity Score
 
     <p>Rosenbaum, P. & Rubin, D. (1983). The central role of the propensity score in observational studies for causal effects. <i>Biometrika, 70</i>, 41–55.</p>
     <div class="post-nav">
-      <div class="prev"><a href="/software-blog/matching">← Matching</a></div>
-      <div class="next"><a href="/software-blog/trimming">Trimming →</a></div>
+      <div class="prev"><a href="/causal-inference-blog/matching">← Matching</a></div>
+      <div class="next"><a href="/causal-inference-blog/trimming">Trimming →</a></div>
     </div>
   </div>
 </body>
