@@ -45,3 +45,15 @@ code {
   margin-top: -1em;
   margin-bottom: 2em;
 }
+
+pre {
+  background: #f8f8f8;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.95rem;
+}
+
+code {
+  font-family: Menlo, Monaco, Consolas, monospace;
+}
