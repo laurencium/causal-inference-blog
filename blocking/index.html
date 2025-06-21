@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Blocking</title>
-  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <link rel="stylesheet" href="/causal-inference-blog/style.css?v=2">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script type="text/javascript" id="MathJax-script" async
@@ -13,20 +13,25 @@
 <body>
   <div class="container">
     <h1>Blocking</h1>
-    <p class="post-meta">By Laurence Wong · September 12, 2016</p>
+    <div class="post-meta-bar">
+      <p class="post-meta">
+        By <a href="https://laurencewong.com/" class="author-link" target="_blank" rel="noopener">Laurence Wong</a> · September 12, 2016
+      </p>
+      <p class="index-link"><a href="/causal-inference-blog/">← Back to Index</a></p>
+    </div>
 
     <p>With the sample divided into strata of units that have similar propensity scores, we should be able to get clean estimates of treatment effects within each block. Aggregating these estimates appropriately gives the blocking estimator, which we illustrate in this post.</p>
 
-    <p>To begin, let's continue with the <a href="/software-blog/example">example data set</a>, and use everything we have discussed previously on it:</p>
+    <p>To begin, let's continue with the <a href="/causal-inference-blog/example">example data set</a>, and use everything we have discussed previously on it:</p>
 
     <pre><code>>>> Y, D, X = vignette_data()
 >>> causal = CausalModel(Y, D, X)
 >>> causal.est_propensity_s()
 >>> causal.trim_s()
 >>> causal.stratify_s()
->>> print(causal.strata)
+>>> print(causal.strata)</code></pre>
 
-Stratification Summary
+    <pre><code>Stratification Summary
 
               Propensity Score         Sample Size     Ave. Propensity   Outcome
    Stratum      Min.      Max.  Controls   Treated  Controls   Treated  Raw-diff
@@ -49,7 +54,7 @@ Stratification Summary
     <pre><code>>>> [stratum.estimates['ols']['ate'] for stratum in causal.strata]
 [10.379170390195274, 9.2918973715823867, 9.6787670925744589, 9.6722830043583361, 9.2239596078237778]</code></pre>
 
-    <p>Note that these estimates are much more stable and closer to the true treatment effect of 10 than the within-bin raw differences in average outcomes that were reported in the stratification summary table, highlighting the virtue of further controlling for covariates even within blocks. Also note that, even though we are using least squares here, we are only doing so <i>locally</i> within each stratum, and therefore are not plagued by some of the issues we raised earlier when we discussed the <a href="/software-blog/least-squares">standard least squares approach</a>.</p>
+    <p>Note that these estimates are much more stable and closer to the true treatment effect of 10 than the within-bin raw differences in average outcomes that were reported in the stratification summary table, highlighting the virtue of further controlling for covariates even within blocks. Also note that, even though we are using least squares here, we are only doing so <i>locally</i> within each stratum, and therefore are not plagued by some of the issues we raised earlier when we discussed the <a href="/causal-inference-blog/least-squares">standard least squares approach</a>.</p>
 
     <p>Taking the sample-weighted average of the above within-bin least squares estimates results in a propensity score matching estimator that is commonly known as the blocking estimator. However, instead of looping through the <code>strata</code> attribute and doing everything manually, we can also simply call <code>est_via_blocking</code> and have all of these operations performed automatically, with the results collected into the attribute <code>estimates</code> as usual:</p>
 
@@ -66,8 +71,8 @@ Treatment Effect Estimates: Blocking
 
     <p>As we can see in the results table, the estimated average treatment effect is now very close to the true value of 10.</p>
     <div class="post-nav">
-      <div class="prev"><a href="/software-blog/stratification">← Stratification</a></div>
-      <div class="next"><a href="/software-blog/weighting">Weighting →</a></div>
+      <div class="prev"><a href="/causal-inference-blog/stratification">← Stratification</a></div>
+      <div class="next"><a href="/causal-inference-blog/weighting">Weighting →</a></div>
     </div>
   </div>
 </body>
