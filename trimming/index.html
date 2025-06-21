@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Trimming</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Trimming</h1>
+    <p class="post-meta">By Laurence Wong · August 23, 2016</p>
+
+    <p>When there is indication of covariate imbalance, we may wish to construct a sample where the treatment and control groups are more similar than the original full sample. One way of doing so is by dropping units with extreme values of propensity scores. For these subjects, their covariate values are such that the probability of being in the treatment (or control) group is so overwhelmingly high that we cannot reliably find comparable units in the opposite group. We may therefore wish to forego estimating treatment effects for such units since nothing much can be credibly said about them.</p>
+
+    <p>A good rule-of-thumb is to drop units whose estimated propensity score is less than 0.1 or greater than 0.9. By default, once the propensity score has been estimated by running either <code>est_propensity</code> or <code>est_propensity_s</code>, a value of 0.1 will be set for the attribute <code>cutoff</code>:</p>
+
+    <pre><code>>>> causal.cutoff
+0.1</code></pre>
+
+    <p>Calling the method <code>trim</code> at this point will drop subjects according to this rule-of-thumb. In general, we can consider dropping units whose estimated propensity lies outside of the \([\alpha, 1-\alpha]\) interval. To trim the sample at \(\alpha = 0.12\), for example, we can set <code>cutoff</code> to 0.12 and call the method <code>trim</code>:</p>
+
+    <pre><code>>>> causal.cutoff = 0.12
+>>> causal.trim()</code></pre>
+
+    <p>Once <code>trim</code> is called, the <code>causal</code> instance will mutate and behave as if the subjects outside of the \([\alpha, 1-\alpha]\) propensity range no longer exist. The usual object attributes and methods will still work as expected after trimming. If we inspect <code>summary_stats</code> at this point, for instance, we will find</p>
+
+    <pre><code>>>> print(causal.summary_stats)
+
+Summary Statistics
+
+                       Controls (N_c=355)         Treated (N_t=324)             
+       Variable         Mean         S.d.         Mean         S.d.     Raw-diff
+--------------------------------------------------------------------------------
+              Y       41.568       29.026       63.069       27.225       21.501
+
+                       Controls (N_c=355)         Treated (N_t=324)             
+       Variable         Mean         S.d.         Mean         S.d.     Nor-diff
+--------------------------------------------------------------------------------
+             X0        3.701        2.825        4.546        2.563        0.313
+             X1        3.489        2.784        4.453        2.461        0.367</code></pre>
+
+    <p>Note that the output statistics are now different from what we saw <a target="_blank" href="balance">earlier</a> with the full sample. In particular, the sample sizes are now 355 and 324 instead of 392 and 608, and the normalized differences in covariate means are 0.313 and 0.367 instead of 0.706 and 0.880, showing marked improvement in covariate balance.</p>
+
+    <p>If the trimming was not satisfactory, we can reset <code>causal</code> to its initial pristine state by</p>
+
+    <pre><code>>>> causal.reset()</code></pre>
+
+    <p>Note that doing so resets everything, so even the propensity scores have to be re-estimated again.</p>
+
+    <p>Instead of setting an arbitrary value for \(\alpha\), a procedure exists that will estimate the optimal cutoff. Crump, Hotz, Imbens, and Mitnik (2009) show that the asymptotic variance of the efficient estimator for the average treatment effect given that the covariate value \(X\) is in some subset \(\mathbb{S}\) of the covariate space is given by</p>
+
+    <p>\[
+    \frac{1}{\mathrm{P}(X \in \mathbb{S})}
+    \mathrm{E}\left[
+      \frac{\sigma_t^2(X)}{p(X)} + \frac{\sigma_c^2(X)}{1 - p(X)} \Big| X \in \mathbb{S}
+    \right].
+    \]</p>
+
+    <p>Here \(\sigma_t^2\) is the conditional variance function for treated units, and \(\sigma_c^2\) is the conditional variance function for control units.</p>
+
+    <p>Letting \(\mathbb{S}\) take the form of \([\alpha, 1 - \alpha]\) and choosing \(\alpha\) to minimize the above asymptotic variance results in the optimal cutoff threshold. This optimal cutoff does not have a closed form solution, but can nonetheless be calculated in \(O(N \log N)\) time.</p>
+
+    <p>To compute the optimal \(\alpha\) and trim the sample based on it in <i>Causalinference</i>, we simply call <code>trim_s</code>, like below:</p>
+
+    <pre><code>>>> causal.trim_s()
+>>> causal.cutoff
+0.0954928016329
+>>> print(causal.summary_stats)
+
+Summary Statistics
+
+                       Controls (N_c=371)         Treated (N_t=363)             
+       Variable         Mean         S.d.         Mean         S.d.     Raw-diff
+--------------------------------------------------------------------------------
+              Y       41.331       29.608       66.067       28.108       24.736
+
+                       Controls (N_c=371)         Treated (N_t=363)             
+       Variable         Mean         S.d.         Mean         S.d.     Nor-diff
+--------------------------------------------------------------------------------
+             X0        3.709        2.872        4.658        2.522        0.351
+             X1        3.407        2.784        4.661        2.517        0.472</code></pre>
+
+    <p>As the above show, the optimal cutoff was determined to be around 0.0955. Note that it is not necessary to call <code>trim</code> after <code>trim_s</code> was called as the trimming occurs automatically as part of <code>trim_s</code>.</p>
+
+    <p>Since <code>causal</code> still behaves like a regular <code>CausalModel</code> instance after trimming, it is possible at this point to run any treatment effect estimation procedures that are available, including <code>est_via_ols</code> and <code>est_via_matching</code>. It is important to note, however, that the estimand is now the average treatment effect restricted to a subpopulation:</p>
+
+    <p>\[
+    \mathrm{E}[Y(1) - Y(0) \mid \alpha < p(X) < 1 - \alpha].
+    \]</p>
+
+    <p>Again, this is because when covariate imbalance is an issue, estimates of the unconditional average treatment effect \(\mathrm{E}[Y(1) - Y(0)]\) are inherently much less credible.</p>
+
+    <h3>References</h3>
+
+    <p>Crump, R., Hotz, V. J., Imbens, G., & Mitnik, O. (2009). Dealing with limited overlap in estimation of average treatment effects. <i>Biometrika, 96</i>, 187–199.</p>
+  </div>
+</body>
+</html>
