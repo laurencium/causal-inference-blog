@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Example</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Example</h1>
+    <p class="post-meta">By Laurence Wong · July 8, 2016</p>
+
+    <p>To better illustrate some of the methods to be introduced presently, in this post we consider a simulated data set that exhibits a certain level of nonlinearity and covariate imbalance. In particular, consider the data generating process described below.</p>
+
+    <p>Let the covariates \(X_1\) and \(X_2\) be generated uniformly, with range between 0 and 10 to enlarge the scale. For the potential outcome \(Y(0)\), we generate it as a simple nonlinear function of the covariates:</p>
+
+    <p>\[ Y(0) = X_1^2 + X_2^2 + \varepsilon_0 \]</p>
+
+    <p>Here \(\varepsilon_0\) is an independently drawn standard normal error term.</p>
+
+    <p>The potential outcome \(Y(1)\) is generated similarly, except with a constant location shift \(\tau\), as follows:</p>
+
+    <p>\[ Y(1) = \tau + X_1^2 + X_2^2 + \varepsilon_1 \]</p>
+
+    <p>The error term \(\varepsilon_1\) is also drawn from the standard normal distribution, independently of everything else. This means that the subject-level treatment effect is</p>
+
+    <p>\[ Y(1) - Y(0) = \tau + (\varepsilon_1 - \varepsilon_0) \]</p>
+
+    <p>Thus the individual treatment effects are heterogeneous because of the second term, but is on average equal to the first term, \(\tau\). Let us set \(\tau = 10\).</p>
+
+    <p>Finally, let the propensity score, that is, the probability of receiving treatment conditional on \(X\), be given by \(p(X) = \phi(X_1, X_2)\), where \(\phi\) is the probability density function of a bivariate normal random vector that has mean \((2, 2)\) and covariance matrix \(\mathrm{diag}\{4, 4\}\). This means that the highest probability of receiving treatment occurs when \(X_1 = X_2 = 2\), and that this probability decays exponentially as we move away from \((2, 2)\).</p>
+
+    <p>Although the data generating process outlined above does exhibit nonlinearity and covariate imbalance, it nonetheless still satisfies unconfoundedness trivially. We therefore should still be able to obtain consistent estimates of the average treatment effect with the appropriate methodology, as we shall see.</p>
+
+    <p>Included in <i>Causalinference</i> is a sample of 1000 observations simulated from this data generating process. We can access it by</p>
+
+    <pre><code>>>> from causalinference.utils import vignette_data
+>>> Y, D, X = vignette_data()
+>>> causal = CausalModel(Y, D, X)</code></pre>
+
+    <p>This particular data set is also the one used in the <a target="_blank" href="https://github.com/laurencium/causalinference/blob/master/docs/tex/vignette.pdf">vignette paper</a> (hence the name). We will continue to employ it for illustration in subsequent posts.</p>
+  </div>
+</body>
+</html>
