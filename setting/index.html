@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Setting</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Setting</h1>
+    <p class="post-meta">By Laurence Wong · June 22, 2016</p>
+
+    <p>Whether an econometric methodology can yield good estimates of treatment effects depends crucially on the setting of the problem. The tools provided by <i>Causalinference</i> do not automatically yield causal estimates that work under every possible setting, so it is important to spell out the assumptions that we are operating under.</p>
+
+    <p>For example, one setting under which <i>Causalinference</i> will work is when we have a completely randomized experiment. Under this setting, we say that the treatment assignment is independent of each subject's potential outcomes, expressed mathematically as</p>
+
+    <p>\[ (Y(0), Y(1)) \perp D \]</p>
+
+    <p>Because subjects are assigned to treatment or control group on the basis of a coin flip, there is no reason to believe that the two groups of individuals are going to be different in any fundamental way other than the treatment they receive. Consequently, the simple difference between the sample averages of the observed outcomes of the two groups will be a consistent estimator of the average treatment effect. <i>Causalinference</i> provides this difference, but since \((Y(0), Y(1)) \perp D\) is such a strong assumption, the other estimators included in the package will yield consistent estimates as well.</p>
+
+    <p>More broadly, the key assumption that <i>Causalinference</i> relies on is the so-called <i>unconfoundedness</i> assumption:</p>
+
+    <p>\[ (Y(0), Y(1)) \perp D \; | \; X \]</p>
+
+    <p>This says that although the treatment assignment mechanism may not be completely independent of potential outcomes, it is <i>unconfounded</i> in the sense that this dependence is only through something we <i>observe</i>, namely the covariates \(X\).</p>
+
+    <p>Thus under unconfoundedness if we control for \(X\), i.e., look across subjects with similar levels of \(X\), whether an individual gets treatment or not should be indistinguishable from random assignment. The difference between those who got treated and those who did not should then be attributable to the treatment itself, much like it was the case in randomized experiments.</p>
+
+    <p>This insight suggests many viable ways of constructing estimators of the average treatment effect. We will go through these estimators next and see how they can be invoked easily using <i>Causalinference</i>.</p>
+  </div>
+</body>
+</html>
