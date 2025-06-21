@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Conclusion</title>
-  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <link rel="stylesheet" href="/causal-inference-blog/style.css?v=2">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script type="text/javascript" id="MathJax-script" async
@@ -13,24 +13,29 @@
 <body>
   <div class="container">
     <h1>Conclusion</h1>
-    <p class="post-meta">By Laurence Wong · September 28, 2016</p>
+    <div class="post-meta-bar">
+      <p class="post-meta">
+        By <a href="https://laurencewong.com/" class="author-link" target="_blank" rel="noopener">Laurence Wong</a> · September 28, 2016
+      </p>
+      <p class="index-link"><a href="/causal-inference-blog/">← Back to Index</a></p>
+    </div>
 
-    <p>In this final post we outline the typical flow of a causal study in relation to the main tools provided by <i>Causalinference</i>. At a high level, assuming that <a href="setting">unconfoundedness</a> holds true in the given problem, we can break down a typical study into two phases.</p>
+    <p>In this final post we outline the typical flow of a causal study in relation to the main tools provided by <i>Causalinference</i>. At a high level, assuming that <a href="/causal-inference-blog/setting">unconfoundedness</a> holds true in the given problem, we can break down a typical study into two phases.</p>
 
     <p>In the <b>design</b> phase, we inspect and manipulate the data set to ensure that the most credible analysis can be conducted on it. We achieve this by proceeding in the following steps:</p>
 
     <ol>
-      <li><a href="balance">Assess covariate balance</a> with <code>summary_stats</code>. If the normalized differences in covariate means suggest severe covariate imbalance, we can try to address it by using the propensity-score-based techniques below.</li>
-      <li><a href="propensity-score">Estimate propensity score</a> with <code>est_propensity_s</code>, so that the following two propensity methods can be employed.</li>
-      <li><a href="trimming">Trim sample</a> with <code>trim_s</code> to exclude subjects with extreme propensity scores. Since very little can be credibly said about such units, we should focus attention on the remaining units that exhibit a higher degree of covariate balance.</li>
-      <li><a href="stratification">Stratify sample</a> with <code>stratify_s</code> to group similar subjects together and improve within-bin covariate balance.</li>
+      <li><a href="/causal-inference-blog/balance">Assess covariate balance</a> with <code>summary_stats</code>. If the normalized differences in covariate means suggest severe covariate imbalance, we can try to address it by using the propensity-score-based techniques below.</li>
+      <li><a href="/causal-inference-blog/propensity-score">Estimate propensity score</a> with <code>est_propensity_s</code>, so that the following two propensity methods can be employed.</li>
+      <li><a href="/causal-inference-blog/trimming">Trim sample</a> with <code>trim_s</code> to exclude subjects with extreme propensity scores. Since very little can be credibly said about such units, we should focus attention on the remaining units that exhibit a higher degree of covariate balance.</li>
+      <li><a href="/causal-inference-blog/stratification">Stratify sample</a> with <code>stratify_s</code> to group similar subjects together and improve within-bin covariate balance.</li>
     </ol>
 
     <p>In the <b>analysis</b> phase, we estimate treatment effects using a number of reasonable estimators. The estimators with the most desirable properties are</p>
 
     <ol>
-      <li>The <a href="blocking">blocking estimator</a> invoked by <code>est_via_blocking</code>, which aggregates the least squares estimates within each propensity bin to produce an overall average treatment effect estimate.</li>
-      <li>The <a href="matching">matching estimator</a> invoked by <code>est_via_matching</code>, which pairs subjects together via nearest-neighborhood matching to arrive at an overall average treatment effect estimate. Since bias can result when the matching is imperfect, bias correction is recommended.</li>
+      <li>The <a href="/causal-inference-blog/blocking">blocking estimator</a> invoked by <code>est_via_blocking</code>, which aggregates the least squares estimates within each propensity bin to produce an overall average treatment effect estimate.</li>
+      <li>The <a href="/causal-inference-blog/matching">matching estimator</a> invoked by <code>est_via_matching</code>, which pairs subjects together via nearest-neighborhood matching to arrive at an overall average treatment effect estimate. Since bias can result when the matching is imperfect, bias correction is recommended.</li>
     </ol>
 
     <p>If the design phase is done well, the two estimates recommended above should result in similar estimates due to their stability properties.</p>
@@ -41,7 +46,7 @@
 
     <p>Imbens, G. (2014). Matching methods in practice: Three examples. <i>NBER Working Paper No. 19959</i>.</p>
     <div class="post-nav">
-      <div class="prev"><a href="/software-blog/weighting">← Weighting</a></div>
+      <div class="prev"><a href="/causal-inference-blog/weighting">← Weighting</a></div>
     </div>
   </div>
 </body>
