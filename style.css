@@ -1,20 +1,40 @@
+/* Typography */
 body {
-  font-family: Georgia, serif;
-  max-width: 700px;
-  margin: 2rem auto;
-  padding: 2rem;
-  line-height: 1.7;
-  background: #fdfdfd;
-  color: #222;
+  font-family: "Georgia", serif;
+  color: #444;
+  background-color: #fdfdfd;
+  line-height: 1.6;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
 }
 
 h1, h2, h3 {
-  font-family: 'Helvetica Neue', sans-serif;
-  margin-top: 2rem;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  color: #222;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-top: 1em;
+}
+
+p {
+  margin-bottom: 1.2em;
 }
 
 code {
-  background: #f2f2f2;
+  background-color: #f0f0f0;
   padding: 0.2em 0.4em;
-  border-radius: 4px;
+  border-radius: 3px;
+}
+
+/* Layout */
+.container {
+  max-width: 660px;
+  margin: 3rem auto;
+  padding: 0 1rem;
 }
