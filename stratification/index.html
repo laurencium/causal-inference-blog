@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Stratification</title>
-  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <link rel="stylesheet" href="/causal-inference-blog/style.css?v=2">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script type="text/javascript" id="MathJax-script" async
@@ -13,7 +13,12 @@
 <body>
   <div class="container">
     <h1>Stratification</h1>
-    <p class="post-meta">By Laurence Wong · September 1, 2016</p>
+    <div class="post-meta-bar">
+      <p class="post-meta">
+        By <a href="https://laurencewong.com/" class="author-link" target="_blank" rel="noopener">Laurence Wong</a> · September 1, 2016
+      </p>
+      <p class="index-link"><a href="/causal-inference-blog/">← Back to Index</a></p>
+    </div>
 
     <p>Unconfoundedness implies that matching on propensity scores also provides a valid way of constructing treatment effect estimators. In this post we look at a few ways of stratifying the sample into blocks that contain units with similar propensity scores.</p>
 
@@ -27,9 +32,9 @@
 
     <p>Running <code>stratify</code> at this point will split the sample into 5 equal-sized bins, all of which will be contained in a new attribute <code>strata</code>. This attribute behaves like a list that contains 5 <code>CausalModel</code> instances, but with some bells and whistles added, including the ability to be <code>print</code>ed:</p>
 
-    <pre><code>>>> print(causal.strata)
+    <pre><code>>>> print(causal.strata)</code></pre>
 
-Stratification Summary
+    <pre><code>Stratification Summary
 
               Propensity Score         Sample Size     Ave. Propensity   Outcome
    Stratum      Min.      Max.  Controls   Treated  Controls   Treated  Raw-diff
@@ -74,9 +79,9 @@ Stratification Summary
 >>> causal.est_propensity_s()
 >>> causal.blocks = [0, 0.3, 0.7, 1]
 >>> causal.stratify()
->>> print(causal.strata)
+>>> print(causal.strata)</code></pre>
 
-Stratification Summary
+    <pre><code>Stratification Summary
 
               Propensity Score         Sample Size     Ave. Propensity   Outcome
    Stratum      Min.      Max.  Controls   Treated  Controls   Treated  Raw-diff
@@ -128,8 +133,8 @@ Stratification Summary
 
     <p>Imbens, G. & Rubin, D. (2015). <i>Causal inference in statistics, social, and biomedical sciences: An introduction</i>. Cambridge University Press.</p>
     <div class="post-nav">
-      <div class="prev"><a href="/software-blog/trimming">← Trimming</a></div>
-      <div class="next"><a href="/software-blog/blocking">Blocking →</a></div>
+      <div class="prev"><a href="/causal-inference-blog/trimming">← Trimming</a></div>
+      <div class="next"><a href="/causal-inference-blog/blocking">Blocking →</a></div>
     </div>
   </div>
 </body>
