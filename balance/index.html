@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Balance</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Balance</h1>
+    <p class="post-meta">By Laurence Wong · July 17, 2016</p>
+
+    <p>Continuing with the simulated data set from the previous post, in this post we will look at some basic summary statistics, as well as assess the degree of covariate balance between the treatment and control groups.</p>
+
+    <p>Once <code>CausalModel</code> has been instantiated, basic summary statistics will be computed and stored in the attribute <code>summary_stats</code>. We can display it by running</p>
+
+    <pre><code>>>> print(causal.summary_stats)
+
+Summary Statistics
+
+                       Controls (N_c=392)         Treated (N_t=608)             
+       Variable         Mean         S.d.         Mean         S.d.     Raw-diff
+--------------------------------------------------------------------------------
+              Y       43.097       31.353       90.911       41.815       47.814
+
+                       Controls (N_c=392)         Treated (N_t=608)             
+       Variable         Mean         S.d.         Mean         S.d.     Nor-diff
+--------------------------------------------------------------------------------
+             X0        3.810        2.950        5.762        2.566        0.706
+             X1        3.436        2.848        5.849        2.634        0.880</code></pre>
+
+    <p>Here <code>Raw-diff</code> denotes the raw difference between the sample means of the control and treatment groups. If the data is generated from a completely randomized experiment such that \((Y(0),Y(1)) \perp D\), then this simple difference will be a consistent estimate of the true average treatment effect \(\mathrm{E}[Y(1)-Y(0)]\). As we can see though, the raw difference is 47.814, which seems very far from what we know is the true average treatment effect of 10.</p>
+
+    <p>However, since the data generating process of this data set satisfies unconfoundedness, we should nonetheless be able to identify the average treatment effect if we compare subjects that have similar covariate values. Our ability to do this well depends heavily on the degree of covariate balance, that is, how much do the covariates of the treatment and control groups overlap.</p>
+
+    <p>One way to assess this, recommended by Imbens and Rubin (2015), is to look at the <i>normalized differences</i> in average covariates, defined as</p>
+
+    <p>\[ \frac{\bar{X}_{k,t}-\bar{X}_{k,c}}{\sqrt{(s_{k,t}^2 + s_{k,c}^2) / 2}} \]</p>
+
+    <p>Here \(\bar{X}_{k,t}\) and \(s_{k,t}\) are the sample mean and sample standard deviation of the \(k\)th covariate of the treatment group, and \(\bar{X}_{k,c}\) and \(s_{k,c}\) are the analogous statistics for the control group. The normalized difference for each covariate is displayed under the <code>Nor-diff</code> column in the summary statistics table.</p>
+
+    <p>Note that normalized difference is quite different in purpose from the t-statistic. If our goal is to test the null hypothesis that the covariate means are identical, then the t-statistic provides a good way of assessing whether there is enough information in the data to suggest that this hypothesis is false. In assessing covariate balance, however, our goal is merely to gauge whether the covariates of treatment and control groups demonstrate sufficient overlap. Even the most miniscule difference in covariate means will, given large enough sample size, result in a large t-statistic, and thus the incorrect conclusion that the covariates are not well-balanced. The normalized difference between these means, on the other hand, does not increase (in expectation) as the sample size increases.</p>
+
+    <p>There's no established convention on what values of normalized difference are too large. A rule of thumb is to start worrying about covariate imbalance if several covariates demonstrate a normalized difference of above 0.5. This turns out to be the case for our simulated data, and in later posts we will consider ways to improve covariate balance.</p>
+
+    <p>While <i>Causalinference</i> can be used interactively by printing to screen tables like the above, in many situations it is more convenient to simply access the relevant output statistics directly. In the case of <code>summary_stats</code>, it is in reality just a dictionary-like object, whose keys can be found by inspecting</p>
+
+    <pre><code>>>> causal.summary_stats.keys()
+['Y_c_mean', 'X_t_sd', 'N_t', 'K', 'ndiff', 'N', 'Y_t_sd', 'rdiff', 'Y_t_mean',
+ 'X_c_mean', 'X_t_mean', 'Y_c_sd', 'X_c_sd', 'N_c']</code></pre>
+
+    <p>To retrieve the vector of covariate means for the treatment group, for example, we can simply look up</p>
+
+    <pre><code>>>> causal.summary_stats['X_t_mean']
+array([ 5.76232357,  5.8489734 ])</code></pre>
+
+    <p>In general for <i>Causalinference</i>, any on-screen output will also be accessible directly through some attributes on the <code>CausalModel</code> instance. It is thus possible to use <i>Causalinference</i> programmatically as a part of a larger Python workflow.</p>
+
+    <h3>References</h3>
+    <p>Imbens, G. & Rubin, D. (2015). <i>Causal Inference in Statistics, Social, and Biomedical Sciences: An Introduction</i>. Cambridge University Press.</p>
+  </div>
+</body>
+</html>
