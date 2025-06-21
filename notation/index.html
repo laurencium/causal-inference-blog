@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Notation</title>
-  <link rel="stylesheet" href="/software-blog/style.css">
+  <link rel="stylesheet" href="/causal-inference-blog/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script type="text/javascript" id="MathJax-script" async
@@ -13,31 +13,36 @@
 <body>
   <div class="container">
     <h1>Notation</h1>
+    <div class="post-meta-bar">
+      <p class="post-meta">
+        By <a href="https://laurencewong.com/" class="author-link" target="_blank" rel="noopener">Laurence Wong</a> · June 16, 2016
+      </p>
+      <p class="index-link"><a href="/causal-inference-blog/">← Back to Index</a></p>
+    </div>
 
-    <p class="post-meta">By Laurence Wong · June 16, 2016</p>
-  
     <p>In a nutshell, a causal effect is simply the difference between what happened and what would have happened. This notion is articulated more precisely by the so-called potential outcome framework, developed by Donald Rubin in the seventies. It goes as follows.</p>
-  
+
     <p>Suppose associated with each subject is a pair of potential outcomes, \(Y(0)\) and \(Y(1)\). Here \(Y(0)\) denotes the outcome that would result if the subject does not receive the treatment, and \(Y(1)\) denotes the outcome that would result if the subject does receive the treatment. Defined this way, the treatment effect for the subject is simply \(Y(1)-Y(0)\).</p>
-  
+
     <p>For each subject, let their treatment status be denoted by the binary variable \(D\). That is, if the subject received treatment, put \(D=1\); otherwise put \(D=0\). This allows us to write the <i>observed</i> outcome — denote it by \(Y\) — as</p>
-  
+
     <p>\[ Y = (1-D)Y(0) + DY(1) \]</p>
-  
+
     <p>\(Y(0)\) and \(Y(1)\) are called <i>potential</i> outcomes because only one of them will be realized and observed as \(Y\), since subjects cannot both receive and not receive treatment. This is the <i>fundamental problem of causal inference</i> (Holland, 1986): for every subject, one of the potential outcomes will always be missing; yet causal effects are necessarily defined in terms of both.</p>
-  
+
     <p>Partly because of this problem, we will have better luck if we focus not on the subject-level treatment effect \(Y(1)-Y(0)\), but instead on the average treatment effect, \(\mathrm{E}[Y(1)-Y(0)]\), or other similar aggregate quantities.</p>
-  
+
     <p>In most applications, we will also observe a vector of individual characteristics, or covariates, for each subject. Let us denote this by \(X\). The vector of <i>observables</i> for each subject is therefore the triple \((Y, D, X)\).</p>
-  
+
     <p>Finally, denote the probability of receiving treatment conditional on \(X\), also known as the <i>propensity score</i>, by \(p(X)\). That is, let \(p(X) = \mathrm{P}(D=1|X)\). As we shall see, this quantity will play a central role in most of what follows.</p>
-  
+
     <h3>References</h3>
-  
+
     <p>Holland, P. (1986). Statistics and causal inference. <i>Journal of the American Statistical Association, 81</i>, 945–960.</p>
+
     <div class="post-nav">
-      <div class="prev"><a href="/software-blog/introduction">← Introduction</a></div>
-      <div class="next"><a href="/software-blog/setting">Setting →</a></div>
+      <div class="prev"><a href="/causal-inference-blog/introduction">← Introduction</a></div>
+      <div class="next"><a href="/causal-inference-blog/setting">Setting →</a></div>
     </div>
   </div>
 </body>
