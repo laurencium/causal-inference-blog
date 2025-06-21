@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Trimming</title>
-  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <link rel="stylesheet" href="/causal-inference-blog/style.css?v=2">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script type="text/javascript" id="MathJax-script" async
@@ -13,7 +13,12 @@
 <body>
   <div class="container">
     <h1>Trimming</h1>
-    <p class="post-meta">By Laurence Wong · August 23, 2016</p>
+    <div class="post-meta-bar">
+      <p class="post-meta">
+        By <a href="https://laurencewong.com/" class="author-link" target="_blank" rel="noopener">Laurence Wong</a> · August 23, 2016
+      </p>
+      <p class="index-link"><a href="/causal-inference-blog/">← Back to Index</a></p>
+    </div>
 
     <p>When there is indication of covariate imbalance, we may wish to construct a sample where the treatment and control groups are more similar than the original full sample. One way of doing so is by dropping units with extreme values of propensity scores. For these subjects, their covariate values are such that the probability of being in the treatment (or control) group is so overwhelmingly high that we cannot reliably find comparable units in the opposite group. We may therefore wish to forego estimating treatment effects for such units since nothing much can be credibly said about them.</p>
 
@@ -44,7 +49,7 @@ Summary Statistics
              X0        3.701        2.825        4.546        2.563        0.313
              X1        3.489        2.784        4.453        2.461        0.367</code></pre>
 
-    <p>Note that the output statistics are now different from what we saw <a target="_blank" href="balance">earlier</a> with the full sample. In particular, the sample sizes are now 355 and 324 instead of 392 and 608, and the normalized differences in covariate means are 0.313 and 0.367 instead of 0.706 and 0.880, showing marked improvement in covariate balance.</p>
+    <p>Note that the output statistics are now different from what we saw <a target="_blank" href="/causal-inference-blog/balance" rel="noopener">earlier</a> with the full sample. In particular, the sample sizes are now 355 and 324 instead of 392 and 608, and the normalized differences in covariate means are 0.313 and 0.367 instead of 0.706 and 0.880, showing marked improvement in covariate balance.</p>
 
     <p>If the trimming was not satisfactory, we can reset <code>causal</code> to its initial pristine state by</p>
 
@@ -99,8 +104,8 @@ Summary Statistics
 
     <p>Crump, R., Hotz, V. J., Imbens, G., & Mitnik, O. (2009). Dealing with limited overlap in estimation of average treatment effects. <i>Biometrika, 96</i>, 187–199.</p>
     <div class="post-nav">
-      <div class="prev"><a href="/software-blog/propensity-score">← Propensity Score</a></div>
-      <div class="next"><a href="/software-blog/stratification">Stratification →</a></div>
+      <div class="prev"><a href="/causal-inference-blog/propensity-score">← Propensity Score</a></div>
+      <div class="next"><a href="/causal-inference-blog/stratification">Stratification →</a></div>
     </div>
   </div>
 </body>
