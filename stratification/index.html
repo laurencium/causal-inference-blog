@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Stratification</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Stratification</h1>
+    <p class="post-meta">By Laurence Wong · September 1, 2016</p>
+
+    <p>Unconfoundedness implies that matching on propensity scores also provides a valid way of constructing treatment effect estimators. In this post we look at a few ways of stratifying the sample into blocks that contain units with similar propensity scores.</p>
+
+    <p><i>Causalinference</i> provides two methods for subclassification based on propensity score. The first, <code>stratify</code>, splits the sample based on what is specified in the attribute <code>blocks</code>. This attribute is created and assigned a default value of 5 whenever <code>est_propensity</code> or <code>est_propensity_s</code> is run:</p>
+
+    <pre><code>>>> Y, D, X = vignette_data()
+>>> causal = CausalModel(Y, D, X)
+>>> causal.est_propensity_s()
+>>> causal.blocks
+5</code></pre>
+
+    <p>Running <code>stratify</code> at this point will split the sample into 5 equal-sized bins, all of which will be contained in a new attribute <code>strata</code>. This attribute behaves like a list that contains 5 <code>CausalModel</code> instances, but with some bells and whistles added, including the ability to be <code>print</code>ed:</p>
+
+    <pre><code>>>> print(causal.strata)
+
+Stratification Summary
+
+              Propensity Score         Sample Size     Ave. Propensity   Outcome
+   Stratum      Min.      Max.  Controls   Treated  Controls   Treated  Raw-diff
+--------------------------------------------------------------------------------
+         1     0.064     0.267       170        30     0.183     0.185     9.282
+         2     0.268     0.498       115        85     0.368     0.388    12.928
+         3     0.499     0.777        74       126     0.629     0.647    11.131
+         4     0.778     0.937        27       173     0.844     0.872    12.778
+         5     0.937     0.996         6       194     0.949     0.973    26.964</code></pre>
+
+    <p>Since <code>strata</code> works like a Python list, you can, for instance, access specific stratum and work on it like a regular <code>CausalModel</code> instance:</p>
+
+    <pre><code>>>> print(causal.strata[0].summary_stats)</code></pre>
+
+    <pre><code>Summary Statistics
+
+                       Controls (N_c=170)          Treated (N_t=30)             
+       Variable         Mean         S.d.         Mean         S.d.     Raw-diff
+--------------------------------------------------------------------------------
+              Y       35.495       32.329       44.777       33.344        9.282
+
+                       Controls (N_c=170)          Treated (N_t=30)             
+       Variable         Mean         S.d.         Mean         S.d.     Nor-diff
+--------------------------------------------------------------------------------
+             X0        3.336        3.287        2.912        3.281       -0.129
+             X1        2.329        2.886        2.693        2.998        0.124</code></pre>
+
+    <p>We can also loop over it like any Python list:</p>
+
+    <pre><code>>>> for stratum in causal.strata:
+...     print(stratum.summary_stats['ndiff'])
+...
+[-0.12909363  0.12373693]
+[ 0.13403878 -0.00388046]
+[ 0.02754279  0.0482487 ]
+[ 0.14361112  0.02104157]
+[ 0.48662652  0.30347525]</code></pre>
+
+    <p>Instead of splitting the sample into equal-sized bins, it is possible to specify exactly the propensity bin boundary values and ask <code>stratify</code> to split the sample accordingly. The following illustrates how we can split the sample into 3 bins, with boundaries at 0.3 and 0.7:</p>
+
+    <pre><code>>>> causal.reset()
+>>> causal.est_propensity_s()
+>>> causal.blocks = [0, 0.3, 0.7, 1]
+>>> causal.stratify()
+>>> print(causal.strata)
+
+Stratification Summary
+
+              Propensity Score         Sample Size     Ave. Propensity   Outcome
+   Stratum      Min.      Max.  Controls   Treated  Controls   Treated  Raw-diff
+--------------------------------------------------------------------------------
+         1     0.064     0.300       193        47     0.195     0.220    11.569
+         2     0.300     0.697       150       159     0.470     0.526    13.864
+         3     0.703     0.996        49       402     0.823     0.910    33.862</code></pre>
+
+    <p>Finally, it is also possible to split the sample in a more data-driven way. The intuition for this is that, as the sample size increases, we should be able to more finely divide the sample into more bins so that we increase the degree of propensity score similarity within each bin.</p>
+
+    <p>In particular, the second method for subclassification, <code>stratify_s</code>, will use a data-driven procedure for selecting both the number of blocks and their boundaries, with the expectation that the number of blocks should increase with the sample size. At a high level, this algorithm, suggested by Imbens and Rubin (2015), works as follows:</p>
+
+    <ol>
+      <li>Divide the sample into two using the median propensity score as the split point.</li>
+      <li>Run a two-sample t-test to test whether the average linearized propensity scores of the two split strata are significantly different. If so, keep the split. Otherwise, revert and stop.</li>
+      <li>Recursively repeat Steps 1 and 2 on the left and right strata.</li>
+    </ol>
+
+    <p>It is not difficult to show that this divide-and-conquer algorithm runs in \(O(N \log N)\) time, and so is very inexpensive to perform. To implement this in <i>Causalinference</i>, simply run <code>stratify_s</code>:</p>
+
+    <pre><code>>>> causal.reset()
+>>> causal.est_propensity_s()
+>>> causal.stratify_s()
+>>> print(causal.strata)</code></pre>
+
+    <pre><code>Stratification Summary
+
+              Propensity Score         Sample Size     Ave. Propensity   Outcome
+   Stratum      Min.      Max.  Controls   Treated  Controls   Treated  Raw-diff
+--------------------------------------------------------------------------------
+         1     0.064     0.204       106        20     0.149     0.163     4.430
+         2     0.205     0.262        55         8     0.235     0.221    21.904
+         3     0.262     0.312        39        23     0.283     0.284    19.669
+         4     0.312     0.469        78        47     0.388     0.399     8.866
+         5     0.471     0.646        51        74     0.563     0.551    15.079
+         6     0.648     0.805        37        88     0.722     0.727     8.637
+         7     0.807     0.862        11        52     0.831     0.837    -0.457
+         8     0.862     0.910         5        57     0.883     0.889     6.973
+         9     0.911     0.996        10       239     0.940     0.964    28.056</code></pre>
+
+    <p>If we inspect <code>blocks</code> at this point, we can see the boundary points that were selected by the algorithm:</p>
+
+    <pre><code>>>> causal.blocks
+[0.064452633756050537, 0.20407017570006966, 0.26211924475391141, 0.31210473124612848, 0.4694140664640063, 0.64589266254404365, 0.80512142741982795, 0.86163972091018581, 0.90955041887994104, 0.99635034430606662]</code></pre>
+
+    <p>As we can see above, the number of bins selected by the algorithm is quite a bit larger than the default number of 5, with each bin containing units that have very similar average estimated propensity scores.</p>
+
+    <h3>References</h3>
+
+    <p>Imbens, G. & Rubin, D. (2015). <i>Causal inference in statistics, social, and biomedical sciences: An introduction</i>. Cambridge University Press.</p>
+  </div>
+</body>
+</html>
