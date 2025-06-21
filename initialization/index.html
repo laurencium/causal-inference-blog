@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Initialization</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Initialization</h1>
+    <p class="post-meta">By Laurence Wong · June 30, 2016</p>
+
+    <p>In this post we will go over the installation of <i>Causalinference</i>, as well as how to initialize the main class <code>CausalModel</code>.</p>
+
+    <p>To install <i>Causalinference</i>, simply type the following into the terminal:</p>
+
+    <pre><code>$ pip install causalinference</code></pre>
+
+    <p>This assumes that Pip was properly set up, and that the dependencies NumPy and SciPy have been installed. If any of these pose an issue, I recommend consulting <a target="_blank" href="http://www.sourabhbajaj.com/mac-setup">this very excellent guide</a>.</p>
+
+    <p>The main object of interest in <i>Causalinference</i> is the class <code>CausalModel</code>, which we can import with</p>
+
+    <pre><code>>>> from causalinference import CausalModel</code></pre>
+
+    <p><code>CausalModel</code> takes as inputs three NumPy arrays: <code>Y</code>, an \(N\)-vector of observed outcomes; <code>D</code>, an \(N\)-vector of treatment status indicators; and <code>X</code>, an \(N\)-by-\(K\) matrix of covariates.</p>
+
+    <p>To initialize a <code>CausalModel</code> instance called, say, <code>causal</code>, simply run</p>
+
+    <pre><code>>>> causal = CausalModel(Y, D, X)</code></pre>
+
+    <p>If you don't have any particular data set handy yet, we can get a random one with</p>
+
+    <pre><code>>>> from causalinference.utils import random_data
+>>> Y, D, X = random_data()</code></pre>
+
+    <p>In any case, once an instance of the class <code>CausalModel</code> has been created, it will contain a number of attributes and methods that are relevant for conducting causal analyses. As is the tradition in Python, these can be listed out by invoking <code>dir</code> on the object:</p>
+
+    <pre><code>>>> dir(causal)
+['__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_post_pscore_init', 'blocks', 'cutoff', 'est_propensity', 'est_propensity_s', 'est_via_blocking', 'est_via_matching', 'est_via_ols', 'est_via_weighting', 'estimates', 'old_data', 'propensity', 'raw_data', 'reset', 'strata', 'stratify', 'stratify_s', 'summary_stats', 'trim', 'trim_s']</code></pre>
+
+    <p>Detailed documentation for the methods, on the other hand, can be found by</p>
+
+    <pre><code>>>> help(causal)</code></pre>
+
+    <p>For easy reading, this information is also available on the package's <a target="_blank" href="http://causalinferenceinpython.org/causalinference.html">website</a>.</p>
+
+    <p><code>CausalModel</code> is <i>stateful</i>. This means that as we employ the methods we saw listed above, the instance <code>causal</code> will mutate, with new data being added or existing data being modified or dropped. To return <code>causal</code> to its initial state, simply run</p>
+
+    <pre><code>>>> causal.reset()</code></pre>
+  </div>
+</body>
+</html>
