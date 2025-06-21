@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Matching</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Matching</h1>
+    <p class="post-meta">By Laurence Wong · August 4, 2016</p>
+
+    <p>One way to overcome the problem of excessive extrapolation by least squares involves directly executing on the unconfoundedness assumption and nonparametrically matching subjects with similar covariate values together. As we shall see, least squares still plays an important role under this approach, but its scope is restricted to being a local one.</p>
+
+    <p>Recall that unconfoundedness says that conditional on \(X\), treatment assignment is as good as random. This means that conditional on \(X\), we should be able to estimate the <i>conditional</i> average treatment effect \(\mathrm{E}[Y(1)-Y(0)|X]\) by simply computing the difference between the average outcomes of the treated and control subjects that share similar covariate values. Once the conditional average treatment effects have been identified and estimated, we should then be able to recover the unconditional average treatment effect by aggregating them appropriately. This is the matching estimator of Abadie and Imbens (2006) in a nutshell.</p>
+
+    <p>More specifically, match each unit \(i\) in the sample with a unit \(m(i)\) in the opposite group, where</p>
+
+    <p>\[ m(i) = \mathrm{argmin}_{j: D_j \neq D_i} \|X_j - X_i\| \]</p>
+
+    <p>Here \(\|X_j - X_i\|\) denotes some measure of distance between the covariate vectors \(X_j\) and \(X_i\). More precisely, it is defined as</p>
+
+    <p>\[ \|X_j - X_i\| = (X_j - X_i)' W (X_j - X_i) \]</p>
+
+    <p>By varying the positive-definite weighting matrix \(W\) we can obtain different measures of distance. One reasonable candidate for \(W\) is the inverse variance matrix \(\mathrm{diag}\{\hat{\sigma}_1^{-2}, \ldots, \hat{\sigma}_K^{-2}\}\), where \(\hat{\sigma}_k\) denotes the sample standard deviation of the \(k\)th covariate. Using this weighting matrix ensures that each covariate is put on a comparable scale before being aggregated.</p>
+
+    <p>Once the matching is complete, we can estimate the subject-level treatment effect by calculating the difference in observed outcomes between the subject and its matched twin. Averaging over these individual treatment effect estimates gives an estimate of the overall average treatment effect.</p>
+
+    <p>In <i>Causalinference</i>, we can implement this matching estimator and display the results by</p>
+
+    <pre><code>>>> causal.est_via_matching()
+>>> print(causal.estimates)
+
+Treatment Effect Estimates: Matching
+
+                     Est.       S.e.          z      P>|z|      [95% Conf. int.]
+--------------------------------------------------------------------------------
+           ATE     14.245      1.038     13.728      0.000     12.211     16.278
+           ATC     10.288      1.815      5.669      0.000      6.731     13.845
+           ATT     16.796      0.940     17.866      0.000     14.953     18.638</code></pre>
+
+    <p>While the basic matching estimator is theoretically sound, as we see above its actual performance seems to be lacking, as its ATE estimate of 14.245 still seems quite far from the true value of 10. One reason is that in practice, the matching of one subject to another is rarely perfect. To the extent that a <i>matching discrepancy</i> exists, i.e., that \(X_i\) and \(X_{m(i)}\) are not equal, the matching estimator of the subject-level treatment effect will generally be biased.</p>
+
+    <p>It turns out it is possible to correct for this bias. In particular, one can show that the unit-level bias for a treated unit is equal to</p>
+
+    <p>\[ \mathrm{E}[Y(0)|X=X_i] - \mathrm{E}[Y(0)|X=X_{m(i)}] \]</p>
+
+    <p>A popular way of adjusting for this bias is to assume a linear specification for the conditional expectation function of \(Y(0)\) given \(X\), and approximate the above term by the inner product of the matching discrepancy and slope coefficient from an ancillary regression. The same principle of course applies for control units.</p>
+
+    <p>Although it might seem like we are back to assuming a linear regression function as was the case with OLS, the role played by the linear approximation is quite different here. In the OLS case, we are using the linearity assumption to extrapolate globally across the covariate space. In the current scenario, however, the linear approximation is only applied locally, to matched units whose covariate values were already quite similar.</p>
+
+    <p>To invoke bias adjustment in <i>Causalinference</i>, we simply supply <code>True</code> to the optional argument <code>bias_adj</code>, as follows:</p>
+
+    <pre><code>>>> causal.est_via_matching(bias_adj=True)
+>>> print(causal.estimates)
+
+Treatment Effect Estimates: Matching
+
+                     Est.       S.e.          z      P>|z|      [95% Conf. int.]
+--------------------------------------------------------------------------------
+           ATE      9.624      0.245     39.354      0.000      9.145     10.103
+           ATC      9.642      0.270     35.776      0.000      9.114     10.170
+           ATT      9.606      0.318     30.159      0.000      8.981     10.230</code></pre>
+
+    <p>As we can see above, the resulting ATE estimate is now much closer to the true ATE of 10.</p>
+
+    <p>In addition to bias adjustments, <code>est_via_matching</code> accepts two other optional parameters worth mentioning. The first is <code>weights</code>, which allows users to supply their own positive-definite weighting matrix to use for calculating distances between covariate vectors. The second is <code>matches</code>, which allows users to implement multiple matching by supplying an integer that is greater than 1. Setting <code>matches=3</code>, for instance, will result in having the three closest units matched to a given subject. In general, increasing this number introduces biases (since less ideal matches are being included), but lowers variance (as the counterfactual estimates are less dependent on any single unit). Typically it is advised that the number of matches be kept under 4, though there are no hard-and-fast rules.</p>
+
+    <h3>References</h3>
+
+    <p>Abadie, A. & Imbens, G. (2006). Large sample properties of matching estimators for average treatment effects. <i>Econometrica, 74</i>, 235–267.</p>
+  </div>
+</body>
+</html>
