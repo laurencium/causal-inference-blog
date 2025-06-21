@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Least Squares</title>
+  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Least Squares</h1>
+    <p class="post-meta">By Laurence Wong · July 27, 2016</p>
+
+    <p>One of the simplest treatment effect estimators is the ordinary least squares (OLS) estimator. Below we illustrate several common specifications that can be computed by <i>Causalinference</i>, and describe why least squares can behave poorly when there is not enough covariate overlap.</p>
+
+    <p>To estimate treatment effects via OLS, we simply call the method <code>est_via_ols</code>, which by default runs the following regression:</p>
+
+    <p>\[ Y_i = \alpha + \beta D_i + \gamma' (X_i - \bar{X}) + \delta' D_i (X_i - \bar{X}) + \varepsilon_i \]</p>
+
+    <p>The resulting treatment effect estimates are stored in the attribute <code>estimates</code>, and can be displayed as follows:</p>
+
+    <pre><code>>>> causal.est_via_ols()
+>>> print(causal.estimates)
+
+Treatment Effect Estimates: OLS
+
+                     Est.       S.e.          z      P>|z|      [95% Conf. int.]
+--------------------------------------------------------------------------------
+           ATE      3.672      0.906      4.051      0.000      1.895      5.449
+           ATC     -0.227      0.930     -0.244      0.807     -2.050      1.596
+           ATT      6.186      1.067      5.799      0.000      4.095      8.277</code></pre>
+
+    <p>Here ATE, ATC, and ATT stand for, respectively, average treatment effect, average treatment effect for the controls, and average treatment effect for the treated. Like <code>summary_stats</code>, the attribute <code>estimates</code> is a dictionary-like object that contains the estimation results.</p>
+
+    <p>Numerically, an equivalent way of running the aforementioned regression involves the following steps:</p>
+
+    <ol>
+      <li>Using only control units, regress the observed outcome on the covariates, and collect the regression coefficients. Using these coefficients and the covariates of each <i>treated</i> subject \(i\), compute the least squares prediction and call it \(\hat{Y}_i(0)\).</li>
+      <li>Using only treated units, regress the observed outcome on the covariates, and collect the regression coefficients. Using these coefficients and the covariates of each <i>control</i> subject \(i\), compute the least squares prediction and call it \(\hat{Y}_i(1)\).</li>
+      <li>Estimate the individual-level treatment effect by computing \(\hat{\tau}_i = Y_i - \hat{Y}_i(0)\) for treated subjects and \(\hat{\tau}_i = \hat{Y}_i(1) - Y_i\) for control subjects.</li>
+      <li>Estimate the overall average treatment effect by \(\hat{\tau} = N^{-1} \sum_{i=1}^N \hat{\tau}_i\).</li>
+    </ol>
+
+    <p>It turns out that \(\hat{\tau}\) computed above is numerically identical to the ATE estimate obtained from running the regression displayed at the beginning of this post.</p>
+
+    <p>This result shows that OLS is essentially imputing the missing potential outcomes of a given group by extrapolating linearly from the observations of the other group. It thus follows that the less covariate overlap there is between the two groups the more hopelessly heroic the extrapolation, especially if the underlying relationship between outcomes and covariates is nonlinear to begin with. This explains why the estimated ATE of 3.672 shown above is so far away from the true ATE of 10. Overcoming this problem of OLS motivates much of the remaining estimators we will consider.</p>
+
+    <p>Returning to the method <code>est_via_ols</code>, it is possible to use it to run two even more restrictive linear specifications. The first excludes the interaction terms and runs</p>
+
+    <p>\[ Y_i = \alpha + \beta D_i + \gamma' (X_i - \bar{X}_i) + \varepsilon_i \]</p>
+
+    <p>Unlike the previous specification, this one assumes a constant treatment effect, which, if true, can lead to more precise estimates if the restricted regression is run instead. To do so, simply supply a value of <code>1</code> to the optional parameter <code>adj</code>:</p>
+
+    <pre><code>>>> causal.est_via_ols(adj=1)</code></pre>
+
+    <p>Setting <code>adj=0</code>, on the other hand, specifies that <code>est_via_ols</code> run the following no-covariates regression:</p>
+
+    <p>\[ Y_i = \alpha + \beta D_i + \varepsilon_i \]</p>
+
+    <p>Of course, this gives nothing other than the raw difference between the sample means of the treatment and control groups, and could just as well be obtained from <code>summary_stats</code>, as we saw previously.</p>
+  </div>
+</body>
+</html>
