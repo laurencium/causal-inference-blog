@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Weighting</title>
-  <link rel="stylesheet" href="/software-blog/style.css?v=2">
+  <link rel="stylesheet" href="/causal-inference-blog/style.css?v=2">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script type="text/javascript" id="MathJax-script" async
@@ -13,23 +13,48 @@
 <body>
   <div class="container">
     <h1>Weighting</h1>
-    <p class="post-meta">By Laurence Wong · September 21, 2016</p>
+    <div class="post-meta-bar">
+      <p class="post-meta">
+        By <a href="https://laurencewong.com/" class="author-link" target="_blank" rel="noopener">Laurence Wong</a> · September 21, 2016
+      </p>
+      <p class="index-link"><a href="/causal-inference-blog/">← Back to Index</a></p>
+    </div>
 
     <p>In this post we will look at one additional treatment effect estimator — the so-called doubly-robust weighting estimator.</p>
 
-    <p>First, it turns out that under unconfoundedness, the following two equalities are true: $$\mathrm{E}\left[\frac{D Y}{p(X)}\right] = \mathrm{E}[Y(1)] \quad \mbox{and} \quad \mathrm{E}\left[\frac{(1-D)Y}{1-p(X)}\right] = \mathrm{E}[Y(0)].$$</p>
+    <p>First, it turns out that under unconfoundedness, the following two equalities are true:
+    \[
+    \mathrm{E}\left[\frac{D Y}{p(X)}\right] = \mathrm{E}[Y(1)] \quad \mbox{and} \quad \mathrm{E}\left[\frac{(1-D)Y}{1-p(X)}\right] = \mathrm{E}[Y(0)].
+    \]</p>
 
-    <p>This in turn suggests that the expectation of the potential outcomes can be estimated using $$\hat{\mathrm{E}}[Y(1)] = \frac{1}{N} \sum_{i=1}^N \frac{D_i Y_i}{p(X_i)} \quad \mbox{and} \quad \hat{\mathrm{E}}[Y(0)] = \frac{1}{N} \sum_{i=1}^N \frac{(1-D_i) Y_i}{1-p(X_i)}.$$</p>
+    <p>This in turn suggests that the expectation of the potential outcomes can be estimated using
+    \[
+    \hat{\mathrm{E}}[Y(1)] = \frac{1}{N} \sum_{i=1}^N \frac{D_i Y_i}{p(X_i)} \quad \mbox{and} \quad \hat{\mathrm{E}}[Y(0)] = \frac{1}{N} \sum_{i=1}^N \frac{(1-D_i) Y_i}{1-p(X_i)}.
+    \]</p>
 
     <p>The difference between these two averages is thus a valid estimator of the average treatment effect \(\mathrm{E}[Y(1)-Y(0)]\). This estimator, also known as the Horvitz-Thompson estimator, is closely related to the inverse probability weighted estimators one might see in the missing data literature. In general, inverse probability weighting is used to inflate the weights for subjects who are underrepresented, thereby eliminating the bias that missing data might introduce. In our case, because the propensity score \(p(X)\) represents the probability of observing \(Y(1)\), inverse weighting by \(p(X)\) gives us exactly the right adjustment for eliminating the bias from selection.</p>
 
-    <p>Since the true propensity score is rarely known in practice, we typically use the estimated propensity score \(\hat{p}\) and the modified estimator $$\hat{\mathrm{E}}[Y(1)-Y(0)] = \left(\sum_{i=1}^N \frac{D_i}{\hat{p}(X_i)}\right)^{-1} \sum_{i=1}^N \frac{D_i Y_i}{\hat{p}(X_i)} - \left(\sum_{i=1}^N \frac{1-D_i}{1-\hat{p}(X_i)}\right)^{-1} \sum_{i=1}^N \frac{(1-D_i) Y_i}{1-\hat{p}(X_i)}.$$</p>
+    <p>Since the true propensity score is rarely known in practice, we typically use the estimated propensity score \(\hat{p}\) and the modified estimator
+    \[
+    \hat{\mathrm{E}}[Y(1)-Y(0)] =
+    \left(\sum_{i=1}^N \frac{D_i}{\hat{p}(X_i)}\right)^{-1} \sum_{i=1}^N \frac{D_i Y_i}{\hat{p}(X_i)} -
+    \left(\sum_{i=1}^N \frac{1-D_i}{1-\hat{p}(X_i)}\right)^{-1} \sum_{i=1}^N \frac{(1-D_i) Y_i}{1-\hat{p}(X_i)}.
+    \]</p>
 
-    <p>Alternatively, it is possible to compute the above estimator by running weighted least squares with the regression function $$Y_i = \alpha + \beta D_i + \varepsilon_i,$$</p>
+    <p>Alternatively, it is possible to compute the above estimator by running weighted least squares with the regression function
+    \[
+    Y_i = \alpha + \beta D_i + \varepsilon_i,
+    \]</p>
 
-    <p>with weights given by $$\hat{\lambda}_i = \frac{1}{(1-\hat{p}(X_i))^{1-D_i} \hat{p}(X_i)^{D_i}}.$$</p>
+    <p>with weights given by
+    \[
+    \hat{\lambda}_i = \frac{1}{(1-\hat{p}(X_i))^{1-D_i} \hat{p}(X_i)^{D_i}}.
+    \]</p>
 
-    <p>Expressed this way, it is easy to modify the estimator to further control for covariates, by including them into the regression function: $$Y_i = \alpha + \beta D_i + \gamma' X_i + \varepsilon_i.$$</p>
+    <p>Expressed this way, it is easy to modify the estimator to further control for covariates, by including them into the regression function:
+    \[
+    Y_i = \alpha + \beta D_i + \gamma' X_i + \varepsilon_i.
+    \]</p>
 
     <p>Running weighted least squares on the above regression function with weights \(\hat{\lambda}\) yields the so-called doubly-robust estimator. This estimator has the property that as long as either the specification of the propensity score or the specification of the regression function is correct, it will be consistent for the true average treatment effect.</p>
 
@@ -53,8 +78,8 @@ Treatment Effect Estimates: Weighting
 
     <p>Imbens, G. & Rubin, D. (2015). <i>Causal inference in statistics, social, and biomedical sciences: An introduction</i>. Cambridge University Press.</p>
     <div class="post-nav">
-      <div class="prev"><a href="/software-blog/blocking">← Blocking</a></div>
-      <div class="next"><a href="/software-blog/conclusion">Conclusion →</a></div>
+      <div class="prev"><a href="/causal-inference-blog/blocking">← Blocking</a></div>
+      <div class="next"><a href="/causal-inference-blog/conclusion">Conclusion →</a></div>
     </div>
   </div>
 </body>
