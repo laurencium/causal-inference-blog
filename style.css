@@ -38,3 +38,10 @@ code {
   margin: 3rem auto;
   padding: 0 1rem;
 }
+
+.post-meta {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: -1em;
+  margin-bottom: 2em;
+}
